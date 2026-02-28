@@ -8,6 +8,7 @@ const customersRouter = require('./src/routes/customers');
 const racecontrolRouter = require('./src/routes/racecontrol');
 const ollamaRouter = require('./src/routes/ollama');
 const calendarRouter = require('./src/routes/calendar');
+const waiversRouter = require('./src/routes/waivers');
 const logger = require('./src/utils/logger');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/customers', apiKeyAuth, customersRouter);
 app.use('/api/racecontrol', apiKeyAuth, racecontrolRouter);
 app.use('/api/ollama', apiKeyAuth, ollamaRouter);
 app.use('/api/calendar', apiKeyAuth, calendarRouter);
+app.use('/api/waivers', apiKeyAuth, waiversRouter);
 
 app.listen(PORT, () => {
   logger.info({ port: PORT }, 'RacingPoint API Gateway started');
