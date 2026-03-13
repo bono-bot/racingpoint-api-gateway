@@ -39,7 +39,7 @@ app.use('/api/calendar', apiKeyAuth, calendarRouter);
 app.use('/api/waivers', apiKeyAuth, waiversRouter);
 app.use('/api/comms', apiKeyAuth, commsRouter);
 app.use('/api/transcribe', apiKeyAuth, transcribeRouter);
-app.use('/api/payments', apiKeyAuth, paymentsRouter);
+app.use('/api/payments', paymentsRouter);
 
 app.listen(PORT, () => {
   logger.info({ port: PORT }, 'RacingPoint API Gateway started');
