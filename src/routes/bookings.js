@@ -95,10 +95,15 @@ router.get('/', (req, res) => {
     // Sort by created_at descending
     all.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    const total = all.length;
-    const paginated = all.slice(Number(offset), Number(offset) + Number(limit));
+    // Defensive pagination: NaN-coerce + clamp to sane bounds.
+    // Without this, `?limit=abc` returns NaN and an empty page silently.
+    const lim = Math.min(Math.max(Number(limit) || 50, 1), 500);
+    const off = Math.max(Number(offset) || 0, 0);
 
-    res.json({ bookings: paginated, total, limit: Number(limit), offset: Number(offset) });
+    const total = all.length;
+    const paginated = all.slice(off, off + lim);
+
+    res.json({ bookings: paginated, total, limit: lim, offset: off });
   } catch (err) {
     logger.error({ err }, 'Failed to fetch bookings');
     res.status(500).json({ error: 'Failed to fetch bookings' });

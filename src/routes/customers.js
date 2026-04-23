@@ -79,12 +79,12 @@ router.get('/', (req, res) => {
       sources: Array.from(c.sources),
     }));
 
-    // Search filter
+    // Search filter — null-safe on every column (DB allows NULL name/phone/email)
     if (search) {
       const s = search.toLowerCase();
       result = result.filter(c =>
-        c.name.toLowerCase().includes(s) ||
-        c.phone.includes(s) ||
+        (c.name && c.name.toLowerCase().includes(s)) ||
+        (c.phone && c.phone.includes(s)) ||
         (c.email && c.email.toLowerCase().includes(s))
       );
     }
@@ -92,10 +92,14 @@ router.get('/', (req, res) => {
     // Sort by last booking descending
     result.sort((a, b) => new Date(b.last_booking) - new Date(a.last_booking));
 
-    const total = result.length;
-    const paginated = result.slice(Number(offset), Number(offset) + Number(limit));
+    // Defensive pagination: NaN-coerce + clamp.
+    const lim = Math.min(Math.max(Number(limit) || 50, 1), 500);
+    const off = Math.max(Number(offset) || 0, 0);
 
-    res.json({ customers: paginated, total });
+    const total = result.length;
+    const paginated = result.slice(off, off + lim);
+
+    res.json({ customers: paginated, total, limit: lim, offset: off });
   } catch (err) {
     logger.error({ err }, 'Failed to fetch customers');
     res.status(500).json({ error: 'Failed to fetch customers' });
